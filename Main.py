@@ -106,12 +106,13 @@ def draw(window, grid, totalWidth, cols, rols):
     pygame.display.pygame.update()
 
 def main(window, totalWidth):
+    pygame.init()
     run = True
     COLS = 50
     ROWS = 50
     grid = constructGrid(ROWS, COLS, totalWidth)
 
-    while run:
+    while True:
         draw(window, grid, totalWidth, COLS, ROWS)
 
 
