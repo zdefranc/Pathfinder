@@ -125,7 +125,7 @@ def main(window, totalWidth):
                 quit()
             if pygame.mouse.get_pressed()[0]:
                 clickedTile = getClickedTile(grid,WIDTH,ROWS)
-                if not startTile and not endTile:
+                if not startTile and clickedTile != endTile:
                     clickedTile.tileType = START
                     startTile = clickedTile
                 elif not endTile and clickedTile != startTile:
