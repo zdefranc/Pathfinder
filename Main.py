@@ -1,6 +1,8 @@
 # Welcome Kiddo To Our Little Cute Project
 
 import pygame
+import math
+
 
 WIDTH = 600
 
@@ -22,16 +24,8 @@ END = RED
 BARRIER = BLACK
 OPEN = WHITE
 
-# def gridSetup (window, rows, width): 
-#     grid = []
-#     gap = width//rows
-#     for i in range (rows):
-#         grid.append([])
-#         for j in range (rows):
-#             node = 
-
 class Tile:
-    def init(self, column, row, width, totalCols, totalRows):
+    def __init__(self, column, row, width, totalCols, totalRows):
         self.col = column
         self.row = row
         self.x = width * column
@@ -40,24 +34,25 @@ class Tile:
         self.totalRows = totalRows
         self.totalCols = totalCols
         self.neighbours = []
+        self.tileType = OPEN
 
-    def getColour(self): 
-       return self.colour
+    def getTileType(self): 
+       return self.tileType
 
-    def isStatus(self, status):
-        return self.colour == status
+    def isTileType(self, status):
+        return self.tileType == status
 
     def reset(self):
-	    self.color = OPEN
+	    self.tileType = OPEN
 
     def setStart(self):
-	    self.color = START
+	    self.tileType = START
 
     def setBarrier(self):
-	    self.color = BARRIER
+	    self.tileType = BARRIER
 
     def setEnd(self):
-	    self.color = END
+	    self.tileType = END
 
     def getNeighbours(self, grid):
         self.neighbours = []
@@ -96,23 +91,57 @@ def drawGrid(window, totalWidth, rows, cols):
 def drawTiles(window, grid):
     for rows in grid:
         for i in rows:
-            pygame.draw.rect(window, i.colour, (i.x, i.y, i.width, i.width))
+            pygame.draw.rect(window, i.tileType, (i.x, i.y, i.width, i.width))
 
 def draw(window, grid, totalWidth, cols, rols):
     window.fill(WHITE)
 
     drawTiles(window, grid)
     drawGrid(window, totalWidth, cols, rols)
-    pygame.display.pygame.update()
+    pygame.display.update()
+
+def getClickedTile(grid, totalWidth, rows):
+        gap = totalWidth/rows
+        x, y = pygame.mouse.get_pos()
+
+        tileIndexX = math.floor(x/gap)
+        tileIndexY = math.floor(y/gap)
+
+        return grid[tileIndexX][tileIndexY]
+
 
 def main(window, totalWidth):
-    pygame.init()
     run = True
     COLS = 50
     ROWS = 50
     grid = constructGrid(ROWS, COLS, totalWidth)
+    startTile = None
+    endTile = None
 
     while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if pygame.mouse.get_pressed()[0]:
+                clickedTile = getClickedTile(grid,WIDTH,ROWS)
+                if not startTile and not endTile:
+                    clickedTile.tileType = START
+                    startTile = clickedTile
+                elif not endTile and clickedTile != startTile:
+                    clickedTile.tileType = END
+                    endTile = clickedTile
+                elif clickedTile != startTile and clickedTile != endTile:
+                    clickedTile.tileType = BARRIER
+                
+            elif pygame.mouse.get_pressed()[2]:
+                clickedTile = getClickedTile(grid,WIDTH,ROWS)
+                clickedTile.tileType = OPEN
+                if clickedTile == startTile:
+                    startTile = None
+                elif clickedTile == endTile:
+                    endTile = None
+
         draw(window, grid, totalWidth, COLS, ROWS)
 
 
