@@ -142,10 +142,10 @@ def main(window, totalWidth):
                 elif clickedTile == endTile:
                     endTile = None
 		
-	elif event.type == pygame.KEYDOWN:
-                clickedTile = getClickedTile(grid,WIDTH,ROWS)
-                if  event.key == pygame.K_SPACE:
-                    clickedTile.tileType = BARRIER_WATER
+		elif event.type == pygame.KEYDOWN:
+               	 clickedTile = getClickedTile(grid,WIDTH,ROWS)
+              	  if  event.key == pygame.K_SPACE:
+                  clickedTile.tileType = BARRIER_WATER
 
         draw(window, grid, totalWidth, COLS, ROWS)
 
