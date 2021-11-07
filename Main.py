@@ -10,19 +10,22 @@ WINDOW = pygame.display.set_mode((WIDTH,WIDTH))
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-BLUE = (0, 255, 0)
+BLUE = (0, 0, 140)
+WATER_BLUE = (102, 205, 170, 255)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-PURPLE = (128, 0, 128)
+PURPLE = (128, 0, 255)
 ORANGE = (255, 165 ,0)
 GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
+MARS = ((255, 127, 80, 255))
 
 START = GREEN
 END = RED
 BARRIER = BLACK
-OPEN = WHITE
+BARRIER_WATER = WATER_BLUE
+OPEN = MARS
 
 class Tile:
     def __init__(self, column, row, width, totalCols, totalRows):
@@ -141,6 +144,11 @@ def main(window, totalWidth):
                     startTile = None
                 elif clickedTile == endTile:
                     endTile = None
+		
+		elif event.type == pygame.KEYDOWN:
+               	 clickedTile = getClickedTile(grid,WIDTH,ROWS)
+              	  if  event.key == pygame.K_SPACE:
+                  clickedTile.tileType = BARRIER_WATER
 
         draw(window, grid, totalWidth, COLS, ROWS)
 
