@@ -3,8 +3,6 @@
 import pygame
 import math
 
-from pygame.constants import KEYDOWN
-
 
 WIDTH = 600
 
@@ -26,8 +24,8 @@ MARS = ((255, 127, 80, 255))
 START = GREEN
 END = RED
 BARRIER = BLACK
-OPEN = MARS
 BARRIER_WATER = WATER_BLUE
+OPEN = MARS
 
 class Tile:
     def __init__(self, column, row, width, totalCols, totalRows):
@@ -76,6 +74,7 @@ class Tile:
     
 # def AStar(grid):
 
+
 def constructGrid(rows, cols, totalWidth):
     grid = []
     squareWidth = totalWidth // rows
@@ -115,6 +114,7 @@ def getClickedTile(grid, totalWidth, rows):
         return grid[tileIndexX][tileIndexY]
 
 
+
 def main(window, totalWidth):
     run = True
     COLS = 50
@@ -139,7 +139,6 @@ def main(window, totalWidth):
                 elif clickedTile != startTile and clickedTile != endTile:
                     clickedTile.tileType = BARRIER
                 
-
             elif pygame.mouse.get_pressed()[2]:
                 clickedTile = getClickedTile(grid,WIDTH,ROWS)
                 clickedTile.tileType = OPEN
@@ -153,21 +152,7 @@ def main(window, totalWidth):
                     clickedTile = getClickedTile(grid, WIDTH, ROWS)
                     clickedTile.tileType = BARRIER_WATER
 
-            elif event.type == pygame.KEYDOWN:
-                clickedTile = getClickedTile(grid,WIDTH,ROWS)
-                if  event.key == pygame.K_SPACE:
-                    clickedTile.tileType = BARRIER_WATER
-
-           
-                
-            
-
         draw(window, grid, totalWidth, COLS, ROWS)
 
 
 main(WINDOW,WIDTH)
-<<<<<<< HEAD
-
- 
-=======
->>>>>>> bf77d3a0c43ded73e0f21a7cf3c8f192a6c2811a
