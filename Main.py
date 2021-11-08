@@ -26,13 +26,8 @@ MARS = ((255, 127, 80, 255))
 START = GREEN
 END = RED
 BARRIER = BLACK
-<<<<<<< HEAD
 OPEN = MARS
 BARRIER_WATER = WATER_BLUE
-=======
-BARRIER_WATER = WATER_BLUE
-OPEN = MARS
->>>>>>> bf77d3a0c43ded73e0f21a7cf3c8f192a6c2811a
 
 class Tile:
     def __init__(self, column, row, width, totalCols, totalRows):
