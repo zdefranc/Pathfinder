@@ -26,8 +26,13 @@ MARS = ((255, 127, 80, 255))
 START = GREEN
 END = RED
 BARRIER = BLACK
+<<<<<<< HEAD
 OPEN = MARS
 BARRIER_WATER = WATER_BLUE
+=======
+BARRIER_WATER = WATER_BLUE
+OPEN = MARS
+>>>>>>> bf77d3a0c43ded73e0f21a7cf3c8f192a6c2811a
 
 class Tile:
     def __init__(self, column, row, width, totalCols, totalRows):
@@ -130,7 +135,7 @@ def main(window, totalWidth):
                 quit()
             if pygame.mouse.get_pressed()[0]:
                 clickedTile = getClickedTile(grid,WIDTH,ROWS)
-                if not startTile and not endTile:
+                if not startTile and clickedTile != endTile:
                     clickedTile.tileType = START
                     startTile = clickedTile
                 elif not endTile and clickedTile != startTile:
@@ -147,6 +152,11 @@ def main(window, totalWidth):
                     startTile = None
                 elif clickedTile == endTile:
                     endTile = None
+		
+		elif event.type == pygame.KEYDOWN:
+               	 clickedTile = getClickedTile(grid,WIDTH,ROWS)
+              	  if  event.key == pygame.K_SPACE:
+                  clickedTile.tileType = BARRIER_WATER
 
             elif event.type == pygame.KEYDOWN:
                 clickedTile = getClickedTile(grid,WIDTH,ROWS)
@@ -161,5 +171,8 @@ def main(window, totalWidth):
 
 
 main(WINDOW,WIDTH)
+<<<<<<< HEAD
 
  
+=======
+>>>>>>> bf77d3a0c43ded73e0f21a7cf3c8f192a6c2811a
