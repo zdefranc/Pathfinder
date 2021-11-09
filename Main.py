@@ -51,10 +51,7 @@ class Tile:
         self.totalDistanceScore = None
 
     def __lt__(tile1,tile2):
-        if tile1.totalDistanceScore != tile2.totalDistanceScore:
-            return tile1.totalDistanceScore < tile2.totalDistanceScore
-        else:
-            return tile1.estimatedDistanceScore < tile2.estimatedDistanceScore
+        return tile1.totalDistanceScore < tile2.totalDistanceScore
 
     def getTileType(self): 
         return self.tileType
