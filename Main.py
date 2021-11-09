@@ -10,9 +10,9 @@ WINDOW = pygame.display.set_mode((WIDTH,WIDTH))
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 140)
-WATER_BLUE1 = (102, 205, 170, 255)
-WATER_BLUE2 = (103, 204, 171, 254)
-WATER_BLUE3 = (104, 205, 172, 253)
+WATER_BLUE1 = (102, 205, 170)
+WATER_BLUE2 = (103, 204, 171)
+WATER_BLUE3 = (104, 205, 172)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -20,7 +20,7 @@ PURPLE = (128, 0, 255)
 ORANGE = (255, 165 ,0)
 GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
-MARS = ((255, 127, 80, 255))
+MARS = (255, 127, 80)
 
 START = GREEN
 END = RED
@@ -75,10 +75,11 @@ class Tile:
         self.tileType = END
 
     def setActive(self):
-        if self.isTileType(OPEN):
-            self.tileType = COVERED_OPEN
-        else:
-            self.tileType = COVERED_WATER
+        if not self.isTileType(END):
+            if self.isTileType(OPEN):
+                self.tileType = ACTIVE_OPEN
+            else:
+                self.tileType = ACTIVE_WATER
 
     def setCovered(self):
         if self.isTileType(ACTIVE_OPEN):
@@ -152,12 +153,14 @@ def aStar(draw, grid):
                 if neighbourTile.canBePlacedInQueue():
                     neighbourTile.setActive()
                     activeTileQueue.put((neighbourTile.totalDistanceScore,neighbourTile))
-            print(currentTile.totalDistanceScore)
-            print(currentTile.estimatedDistanceScore)
-            print(currentTile.currentDistanceScore)
-            print("new")
+            # Uncomment to view scores
+            # print(currentTile.totalDistanceScore)
+            # print(currentTile.estimatedDistanceScore)
+            # print(currentTile.currentDistanceScore)
+            # print("new")
             draw()
-            time.sleep(1)
+            time.sleep(0.1)
+        #Draw path
 
 def constructGrid(rows, cols, totalWidth):
     grid = []
@@ -198,7 +201,6 @@ def getClickedTile(grid, totalWidth, rows):
         return grid[tileIndexX][tileIndexY]
 
 
-
 def main(window, totalWidth):
     run = True
     COLS = 50
@@ -237,7 +239,6 @@ def main(window, totalWidth):
                     clickedTile.tileType = WATER
                 elif event.key == pygame.K_SPACE and startTile and endTile:
                     aStar(lambda: draw(window, grid, totalWidth, COLS, ROWS),grid)
-
 
         draw(window, grid, totalWidth, COLS, ROWS)
 
