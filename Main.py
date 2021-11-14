@@ -16,7 +16,8 @@ WATER_BLUE3 = (60, 155, 120)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-PURPLE = (128, 0, 255)
+PURPLE1 = (128, 0, 255)
+PURPLE2 = (100, 0, 200)
 ORANGE = (255, 165 ,0)
 GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
@@ -31,7 +32,8 @@ COVERED_OPEN = ORANGE
 COVERED_WATER = WATER_BLUE2
 ACTIVE_OPEN = GREY
 ACTIVE_WATER = WATER_BLUE3
-PATH = PURPLE
+PATH_OPEN = PURPLE1
+PATH_WATER = PURPLE2
 PATHFOUND = YELLOW
 
 WATER_SCORE = 2
@@ -73,11 +75,14 @@ class Tile:
     def setEnd(self):
         self.tileType = END
 
-    def setPath(self):
-        self.tileType = PATH
+    def setPathOpen(self):
+        self.tileType = PATH_OPEN
 
-    def setPathFound(self):
-        self.tileType = PATHFOUND
+    def setPathWater(self):
+        self.tileType = PATH_WATER
+
+    def setWater(self):
+        self.tileType = WATER
 
     def setActive(self):
         if not self.isTileType(END):
@@ -130,8 +135,17 @@ class Tile:
             self.isTileType(START) and not self.isTileType(ACTIVE_OPEN) and not 
             self.isTileType(ACTIVE_WATER) and not self.isTileType(BARRIER))
 
+def readyGrid(draw, grid):
+    for row in grid:
+        for tile in row:
+            if tile.isTileType(COVERED_OPEN) or tile.isTileType(ACTIVE_OPEN) or tile.isTileType(PATH_OPEN):
+                tile.reset()
+            elif tile.isTileType(COVERED_WATER) or tile.isTileType(ACTIVE_WATER) or tile.isTileType(PATH_WATER):
+                tile.setWater()
+    draw()
 
 def aStar(draw, grid):
+    readyGrid(draw, grid)
     startTile = None
     endTile = None
     currentTile = None
@@ -180,18 +194,16 @@ def aStar(draw, grid):
                     pathfinderTile = neighbourTile
                     bestScore = neighbourTile.currentDistanceScore
         if(not pathfinderTile.isTileType(START)):
-            pathfinderTile.setPath()
-        draw()
-        print(pathfinderTile.currentDistanceScore)
-        print('StartTile')
-        print(startTile.currentDistanceScore)
+            if pathfinderTile.isTileType(COVERED_OPEN):
+                pathfinderTile.setPathOpen()
+            else:
+                pathfinderTile.setPathWater()
     draw()
 
-def resetGrid(draw, grid):
+def resetGrid(grid):
     for row in grid:
         for tile in row:
             tile.reset()
-    draw()
 
 def constructGrid(rows, cols, totalWidth):
     grid = []
@@ -265,13 +277,13 @@ def main(window, totalWidth):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     clickedTile = getClickedTile(grid, WIDTH, ROWS)
-                    clickedTile.tileType = WATER
+                    clickedTile.setWater
                 elif event.key == pygame.K_SPACE and startTile and endTile:
                     aStar(lambda: draw(window, grid, totalWidth, COLS, ROWS),grid)
                 elif event.key == pygame.K_r:
                     endTile = None
                     startTile = None
-                    resetGrid(lambda: draw(window, grid, totalWidth, COLS, ROWS), grid)
+                    resetGrid(grid)
 
         draw(window, grid, totalWidth, COLS, ROWS)
 
