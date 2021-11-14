@@ -144,7 +144,7 @@ def aStar(draw, grid):
                 endTile = tile
     if(startTile and endTile):
         currentTile = startTile
-        currentTile.setCurrentDistanceScore(0)
+        startTile.setCurrentDistanceScore(0)
 
         while(not currentTile.isTileType(END)):
             for event in pygame.event.get():
@@ -170,9 +170,10 @@ def aStar(draw, grid):
             draw()
             time.sleep(0.03)
     pathfinderTile = endTile
-    pathfinderTile.getNeighbours(grid)
+    pathfinderTile.getNeighbours(grid,True)
     bestScore = math.inf
-    while not pathfinderTile.isTileType(START):
+    startTile.setCurrentDistanceScore(0)
+    while not pathfinderTile.currentDistanceScore == 1:
         for neighbourTile in pathfinderTile.neighbours:
             if neighbourTile.isTileType(COVERED_OPEN) or neighbourTile.isTileType(COVERED_WATER):
                 if neighbourTile.currentDistanceScore < bestScore:
@@ -181,7 +182,15 @@ def aStar(draw, grid):
         if(not pathfinderTile.isTileType(START)):
             pathfinderTile.setPath()
         draw()
-    startTile.setPathFound()
+        print(pathfinderTile.currentDistanceScore)
+        print('StartTile')
+        print(startTile.currentDistanceScore)
+    draw()
+
+def resetGrid(draw, grid):
+    for row in grid:
+        for tile in row:
+            tile.reset()
     draw()
 
 def constructGrid(rows, cols, totalWidth):
@@ -208,7 +217,6 @@ def drawTiles(window, grid):
 
 def draw(window, grid, totalWidth, cols, rols):
     window.fill(WHITE)
-
     drawTiles(window, grid)
     drawGrid(window, totalWidth, cols, rols)
     pygame.display.update()
@@ -224,7 +232,6 @@ def getClickedTile(grid, totalWidth, rows):
 
 
 def main(window, totalWidth):
-    run = True
     COLS = 50
     ROWS = 50
     grid = constructGrid(ROWS, COLS, totalWidth)
@@ -261,7 +268,10 @@ def main(window, totalWidth):
                     clickedTile.tileType = WATER
                 elif event.key == pygame.K_SPACE and startTile and endTile:
                     aStar(lambda: draw(window, grid, totalWidth, COLS, ROWS),grid)
-                print('You left')
+                elif event.key == pygame.K_r:
+                    endTile = None
+                    startTile = None
+                    resetGrid(lambda: draw(window, grid, totalWidth, COLS, ROWS), grid)
 
         draw(window, grid, totalWidth, COLS, ROWS)
 
