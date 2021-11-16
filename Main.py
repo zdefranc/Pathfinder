@@ -22,6 +22,7 @@ ORANGE = (255, 165 ,0)
 GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
 MARS = (255, 127, 80)
+MOON_GLOW = (235, 245, 255)
 
 START = GREEN
 END = RED
@@ -34,7 +35,7 @@ ACTIVE_OPEN = GREY
 ACTIVE_WATER = WATER_BLUE3
 PATH_OPEN = PURPLE1
 PATH_WATER = PURPLE2
-PATHFOUND = YELLOW
+PATHFOUND = MOON_GLOW
 
 WATER_SCORE = 2
 OPEN_TILE_SCORE = 1
@@ -83,6 +84,9 @@ class Tile:
 
     def setWater(self):
         self.tileType = WATER
+    
+    def setLastTile(self):
+        self.tileType = PATHFOUND
 
     def setActive(self):
         if not self.isTileType(END):
@@ -196,6 +200,7 @@ def aStar(draw, grid):
         if(not pathfinderTile.isTileType(START)):
             if pathfinderTile.isTileType(COVERED_OPEN):
                 pathfinderTile.setPathOpen()
+                startTile.setLastTile()
             else:
                 pathfinderTile.setPathWater()
     draw()
