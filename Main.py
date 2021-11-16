@@ -277,7 +277,8 @@ def main(window, totalWidth):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w:
                     clickedTile = getClickedTile(grid, WIDTH, ROWS)
-                    clickedTile.setWater
+                    clickedTile.setWater()
+                    
                 elif event.key == pygame.K_SPACE and startTile and endTile:
                     aStar(lambda: draw(window, grid, totalWidth, COLS, ROWS),grid)
                 elif event.key == pygame.K_r:
