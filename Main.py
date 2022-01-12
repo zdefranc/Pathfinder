@@ -2,6 +2,7 @@ import pygame
 import math
 from queue import PriorityQueue
 import time
+import random
 
 WIDTH = 600
 
@@ -181,7 +182,7 @@ def aStar(draw, grid):
                     neighbourTile.setActive()
                     activeTileQueue.put((neighbourTile.totalDistanceScore,neighbourTile))
             # Uncomment to view scores
-            # print(currentTile.totalDistanceScore)
+            
             # print(currentTile.estimatedDistanceScore)
             # print(currentTile.currentDistanceScore)
             # print("new")
@@ -200,10 +201,15 @@ def aStar(draw, grid):
         if(not pathfinderTile.isTileType(START)):
             if pathfinderTile.isTileType(COVERED_OPEN):
                 pathfinderTile.setPathOpen()
-                startTile.setLastTile()
+                endTile.setLastTile()
+                startTile.setPathOpen()
             else:
                 pathfinderTile.setPathWater()
-    draw()
+                
+    time.sleep(0.03)
+    print(currentTile.totalDistanceScore)
+    print("Tiles travelled")
+    draw()   
 
 def resetGrid(grid):
     for row in grid:
