@@ -2,7 +2,6 @@ import pygame
 import math
 from queue import PriorityQueue
 import time
-import random
 
 WIDTH = 600
 
@@ -23,7 +22,6 @@ ORANGE = (255, 165 ,0)
 GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
 MARS = (255, 127, 80)
-MOON_GLOW = (235, 245, 255)
 
 START = GREEN
 END = RED
@@ -36,7 +34,6 @@ ACTIVE_OPEN = GREY
 ACTIVE_WATER = WATER_BLUE3
 PATH_OPEN = PURPLE1
 PATH_WATER = PURPLE2
-PATHFOUND = MOON_GLOW
 
 WATER_SCORE = 2
 OPEN_TILE_SCORE = 1
@@ -65,7 +62,13 @@ class Tile:
     def isTileType(self, status):
         return self.tileType == status
 
-    def reset(self):
+    def resetTile(self):
+        self.tileType = OPEN
+        self.currentDistanceScore = None
+        self.estimatedDistanceScore = None
+        self.totalDistanceScore = None
+
+    def setOpen(self):
         self.tileType = OPEN
 
     def setStart(self):
@@ -85,9 +88,6 @@ class Tile:
 
     def setWater(self):
         self.tileType = WATER
-    
-    def setLastTile(self):
-        self.tileType = PATHFOUND
 
     def setActive(self):
         if not self.isTileType(END):
@@ -102,16 +102,28 @@ class Tile:
         else:
             self.tileType = COVERED_WATER
     
+    def getCurrentDistanceScore(self):
+        return self.currentDistanceScore
+
     def setCurrentDistanceScore(self, score):
         self.currentDistanceScore = score
 
+    def getEstimatedDistanceScore(self):
+        return self.estimatedDistanceScore
+        
     def setEstimatedDistanceScore(self,endTile):
         self.estimatedDistanceScore = abs(endTile.col - self.col) + abs(endTile.row - self.row)
+    
+    def getTotalDistanceScore(self):
+        return self.totalDistanceScore
+
+    def setTotalDistanceScore(self):
+        self.totalDistanceScore = self.estimatedDistanceScore + self.currentDistanceScore 
 
     def setNeighbourCurrentDistanceScore(self, neighbourTile):
         distance = WATER_SCORE if neighbourTile.isTileType(WATER) else OPEN_TILE_SCORE
-        if not neighbourTile.currentDistanceScore or self.currentDistanceScore + distance < neighbourTile.currentDistanceScore:
-            neighbourTile.currentDistanceScore = self.currentDistanceScore + distance
+        if not neighbourTile.getCurrentDistanceScore() or self.getCurrentDistanceScore() + distance < neighbourTile.getCurrentDistanceScore():
+            neighbourTile.setCurrentDistanceScore(self.getCurrentDistanceScore() + distance)
 
     def getNeighbours(self, grid, pathfinding = False):
         self.neighbours = []
@@ -120,7 +132,7 @@ class Tile:
                 self.setNeighbourCurrentDistanceScore(grid[self.col + 1][self.row])
             self.neighbours.append(grid[self.col + 1][self.row])
 
-        if self.col > 0 and not self.isTileType(BARRIER) and not self.isTileType(BARRIER):
+        if self.col > 0 and not self.isTileType(BARRIER):
             if not pathfinding:
                 self.setNeighbourCurrentDistanceScore(grid[self.col - 1][self.row])
             self.neighbours.append(grid[self.col - 1][self.row])
@@ -144,7 +156,7 @@ def readyGrid(draw, grid):
     for row in grid:
         for tile in row:
             if tile.isTileType(COVERED_OPEN) or tile.isTileType(ACTIVE_OPEN) or tile.isTileType(PATH_OPEN):
-                tile.reset()
+                tile.setOpen()
             elif tile.isTileType(COVERED_WATER) or tile.isTileType(ACTIVE_WATER) or tile.isTileType(PATH_WATER):
                 tile.setWater()
     draw()
@@ -164,57 +176,51 @@ def aStar(draw, grid):
     if(startTile and endTile):
         currentTile = startTile
         startTile.setCurrentDistanceScore(0)
-
         while(not currentTile.isTileType(END)):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
             if not activeTileQueue.empty():
-                currentTile = activeTileQueue.get()[1]
+                currentTile = activeTileQueue.get()[2]
             if not currentTile.isTileType(END) and not currentTile.isTileType(START):
                 currentTile.setCovered()
             currentTile.getNeighbours(grid)
             for neighbourTile in currentTile.neighbours:
                 neighbourTile.setEstimatedDistanceScore(endTile)
-                neighbourTile.totalDistanceScore = neighbourTile.estimatedDistanceScore + neighbourTile.currentDistanceScore
+                neighbourTile.setTotalDistanceScore()
                 if neighbourTile.canBePlacedInQueue():
                     neighbourTile.setActive()
-                    activeTileQueue.put((neighbourTile.totalDistanceScore,neighbourTile))
-            # Uncomment to view scores
-            
-            # print(currentTile.estimatedDistanceScore)
-            # print(currentTile.currentDistanceScore)
-            # print("new")
+                    activeTileQueue.put((neighbourTile.getTotalDistanceScore(),neighbourTile.getCurrentDistanceScore(),neighbourTile))
             draw()
             time.sleep(0.03)
+
     pathfinderTile = endTile
     pathfinderTile.getNeighbours(grid,True)
     bestScore = math.inf
     startTile.setCurrentDistanceScore(0)
-    while not pathfinderTile.currentDistanceScore == 1:
+
+    while not pathfinderTile.isTileType(START):
         for neighbourTile in pathfinderTile.neighbours:
-            if neighbourTile.isTileType(COVERED_OPEN) or neighbourTile.isTileType(COVERED_WATER):
-                if neighbourTile.currentDistanceScore < bestScore:
-                    pathfinderTile = neighbourTile
-                    bestScore = neighbourTile.currentDistanceScore
+            if neighbourTile.getCurrentDistanceScore() < bestScore and not neighbourTile.isTileType(BARRIER):
+                pathfinderTile = neighbourTile
+                pathfinderTile.getNeighbours(grid,True)
+                bestScore = neighbourTile.getCurrentDistanceScore()
         if(not pathfinderTile.isTileType(START)):
             if pathfinderTile.isTileType(COVERED_OPEN):
                 pathfinderTile.setPathOpen()
-                endTile.setLastTile()
-                startTile.setPathOpen()
             else:
                 pathfinderTile.setPathWater()
-                
-    time.sleep(0.03)
-    print(currentTile.totalDistanceScore)
+            draw()
+            time.sleep(0.03)
+    print(endTile.getTotalDistanceScore())
     print("Tiles travelled")
     draw()   
 
 def resetGrid(grid):
     for row in grid:
         for tile in row:
-            tile.reset()
+            tile.resetTile()
 
 def constructGrid(rows, cols, totalWidth):
     grid = []
@@ -255,8 +261,8 @@ def getClickedTile(grid, totalWidth, rows):
 
 
 def main(window, totalWidth):
-    COLS = 50
-    ROWS = 50
+    COLS = 30
+    ROWS = 30
     grid = constructGrid(ROWS, COLS, totalWidth)
     startTile = None
     endTile = None
@@ -279,7 +285,7 @@ def main(window, totalWidth):
                 
             elif pygame.mouse.get_pressed()[2]:
                 clickedTile = getClickedTile(grid,WIDTH,ROWS)
-                clickedTile.reset()
+                clickedTile.setOpen()
                 if clickedTile == startTile:
                     startTile = None
                 elif clickedTile == endTile:
